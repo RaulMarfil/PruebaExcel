@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 public class Importar {
     
-    public static void ExcelToSQL(String Fichero, String Tabla) throws SQLException, FileNotFoundException, IOException, InvalidFormatException, ParseException{
+    public static void ExtraccionF1ToSQL(String Fichero, String Tabla) throws SQLException, FileNotFoundException, IOException, InvalidFormatException, ParseException{
     
         int countReg = 0;
     
@@ -183,5 +183,61 @@ public class Importar {
     
     
     }
+    
+    public static void SistemaNegocioToSQL(String Fichero, String Tabla) throws SQLException, FileNotFoundException, IOException, InvalidFormatException, ParseException{
+    
+        int countReg = 0;
+    
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
+            con.setAutoCommit(false);
+            PreparedStatement pstm = null ;
+            InputStream input = new FileInputStream("/Users/rmarfilc/temp/ITSM-Incidencias-Extracciones_julio_2015_ITSM/"+Fichero +".xlsx");
+            
+           
+            
+            Workbook wb = WorkbookFactory.create(input);
+            Sheet sheet = wb.getSheetAt(0);
+            Row row;
+            for(int i=1; i<=sheet.getLastRowNum(); i++){
+                row = sheet.getRow(i);
+                
+                String AppGNF = row.getCell(0).getStringCellValue();
+                if (AppGNF.isEmpty()){break;}
+                
+                String Negocio = row.getCell(1).getStringCellValue();
+                
+                
+                
+                String sql = "INSERT INTO "+Tabla +" (AppGNF,Negocio)"
+                        + "VALUES(?,?)";
+                
+                pstm = (PreparedStatement) con.prepareStatement(sql);
+                pstm.setString(1, AppGNF);
+                pstm.setString(2,Negocio);
+                
+                pstm.execute();
+                
+                countReg = i;
+                //System.out.println("Import rows "+i);
+            }
+            con.commit();
+            pstm.close();
+            con.close();
+            input.close();
+            System.out.println("Importación del fichero " + Fichero + " a la tabla " + Tabla + " efectuado correctamente. " + countReg + " Registros.");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Importar.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    
+    }
+    
+    
+    
+    
+    
+    
     
 }
