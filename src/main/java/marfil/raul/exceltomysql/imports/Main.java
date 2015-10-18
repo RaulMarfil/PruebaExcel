@@ -12,8 +12,6 @@ import marfil.raul.exceltomysql.utilities.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 
-//Prueba
-
 
 
 public class Main {
@@ -32,7 +30,7 @@ public static void main(String[] args) throws SQLException, IOException, FileNot
     
 //     Importar.SistemaNegocioToSQL("SistemasNegocio", "SistemasNegocio");
     
-    Calculo.INC_Cerradas();
+   CalculoINC_Cerradas.Negocio();
 
 }     
 
