@@ -106,7 +106,7 @@ public class Importar {
                 
                 String sql = "INSERT INTO "+Tabla +" (TicketID,CatOP2,FechaCreacion,Estado,Desc_Estado,Enlace_PPM,Grupo_Entrada,Grupo_Actual,Org_Soporte,Categ_Prod_1,"
                         + "Categ_Prod_2,Categ_Prod_3,Nombre_Prod,FechaResolucion,FechaCierre,FechaObjetivo,ExcluirANS,FechaUltimaMod,CanalEntrada,"
-                        + "REQSolicitudServicio,IndispoibilidadServicio,AfectacionUsuarios,Impacto,Prioridad,INCDisfundida,LocalidadCliente,UbicacionCliente,ClienteID,"
+                        + "REQSolicitudServicio,IndisponibilidadServicio,AfectacionUsuarios,Impacto,Prioridad,INCDisfundida,LocalidadCliente,UbicacionCliente,ClienteID,"
                         + "NombreCliente,ApellidosCliente,AmbitoSS,CatOperacional1,Resumen,Notas,NumReasing,NumReaperturas,Memo,Remitente,UsuarioAsignado,Resolucion,TipoIncidencia,VIP,FechaInicioReal"
                         + ",FechaProgramadaDeInicio,FechaProgramadaDeFinalizacion,Patron,CausaRaiz,GrupoPredetRemitente,UsuarioResolutor,MotivoResolucion)"
                         + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";

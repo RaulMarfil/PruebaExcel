@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,17 +27,22 @@ public class CalculoINC_Cerradas {
 
     public static void Negocio() throws SQLException, ParseException {
         
+        final long MILLSECS_PER_DAY = 24 * 60 * 60 * 1000;
         
         String queryNegocio = "SELECT INC_Por_Fecha_Cierre.TicketID, INC_Por_Fecha_Cierre.Categ_Prod_2, SistemasNegocio.Negocio, AmbitoSS, Org_Soporte, FechaCierre \n" +
-        ", NumReasing FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
+        ", NumReasing,IndisponibilidadServicio, FechaCreacion, FechaResolucion FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
         String insertCalculo = "";
         String Negocio, fechaCierre,Org_Soporte,AmbitoSS,CategProd2,TicketID = "";
         int numEscalados = 0;
         int escalados0a2 = 0;
         int escalados3a5 = 0;
         int escalados5mas = 0;
-        
-        
+        int indisponibilidad = 0;
+        int resuelto = 0;
+        Integer calculoResuelto = 0;
+        Timestamp fechaCreacionTS = null;
+        Timestamp fechaResolucionTS = null;
+        Timestamp FechaCierreTS = null;
         
         
     try (Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
@@ -61,6 +67,8 @@ public class CalculoINC_Cerradas {
                 fechaCierre = new SimpleDateFormat("yyyy-MM").format(rs.getTimestamp("FechaCierre"));
                 
                 numEscalados = rs.getInt("NumReasing");
+                
+                indisponibilidad = rs.getInt("IndisponibilidadServicio");
                 
                 //Informamos Negocio Final
               
@@ -96,13 +104,9 @@ public class CalculoINC_Cerradas {
                     Negocio = "LATAM";
                 }
                     
-                
-                
                 if (AmbitoSS.equals("GNFT") && Org_Soporte.equals("TELECOMUNICACIONES - ESP")) {
                     Negocio = "NO GNF";
-                    
                 }
-                
                 
                 if (Negocio == null) {Negocio = "No Informado";}
                 
@@ -114,25 +118,48 @@ public class CalculoINC_Cerradas {
                 if (numEscalados >= 0 && numEscalados < 2) {
                     escalados0a2 = 1;
                 }
-                
                 if (numEscalados >= 3 && numEscalados < 5) {
                     escalados3a5 = 1;
                 }
-                
                   if (numEscalados > 5 ) {
                     escalados5mas = 1;
                 }
-                
-                
                 //Fin Calculo escalados.
                 
+                //Inicio calculo factor resulto
+                  
+                fechaCreacionTS = rs.getTimestamp("FechaCreacion");
+                fechaResolucionTS = rs.getTimestamp("FechaResolucion");
+                FechaCierreTS = rs.getTimestamp("FechaCierre");
                 
+                if (fechaResolucionTS == null){
+                resuelto = (int) ((FechaCierreTS.getTime() - fechaCreacionTS.getTime()) / MILLSECS_PER_DAY);
                 
+                } else {
+                resuelto = (int) ((fechaResolucionTS.getTime() - fechaCreacionTS.getTime()) / MILLSECS_PER_DAY);
+                
+                }
                
+                if (resuelto < 0){calculoResuelto = null;} 
+                
+                if (resuelto > 0 && resuelto <= 1) {calculoResuelto = 1;} // Resuelto en menos de 1
+                
+                if (resuelto > 1 && resuelto <= 2) {calculoResuelto = 2;} //Resuelto en 1-2
+                
+                if (resuelto > 3 && resuelto <= 5) {calculoResuelto = 3;} // Resuelto en 3-5
+                
+                if (resuelto > 5) {calculoResuelto = 4;} // Resuelto en más de 5
+                
+                        
+                        
+                //Fin calculo factor resulto
+                
+                
                 
                 
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
-                        " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas);
+                        " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas + 
+                        " Indisponibilidad: " + indisponibilidad + " Resuelto en: " + calculoResuelto);
                 
 //               insertCalculo =  "INSERT INTO INC_Por_Fecha_Cierre_Result (TicketID,Negocio)"
 //                       + "VALUES(?,?)";
@@ -148,11 +175,13 @@ public class CalculoINC_Cerradas {
 //                pstmInsert.close();
                 
                 
-                //inicializamos contadores escalados.
+                //inicializamos contadores.
                 
                 escalados0a2 = 0;
                 escalados3a5 = 0;
                 escalados5mas = 0;
+                resuelto = 0;
+                calculoResuelto = 0;
                         
                 
             }
