@@ -30,7 +30,7 @@ public class CalculoINC_Cerradas {
         final long MILLSECS_PER_DAY = 24 * 60 * 60 * 1000;
         
         String queryNegocio = "SELECT INC_Por_Fecha_Cierre.TicketID, INC_Por_Fecha_Cierre.Categ_Prod_2, SistemasNegocio.Negocio, AmbitoSS, Org_Soporte, FechaCierre \n" +
-        ", NumReasing,IndisponibilidadServicio, FechaCreacion, Prioridad, NombreCliente, FechaResolucion FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
+        ", NumReasing,IndisponibilidadServicio, FechaCreacion, Prioridad, NombreCliente, FechaResolucion, NumReaperturas FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
         String insertCalculo = "";
         String Negocio, fechaCierre,Org_Soporte,AmbitoSS,CategProd2,TicketID = "";
         int numEscalados = 0;
@@ -45,7 +45,8 @@ public class CalculoINC_Cerradas {
         Timestamp FechaCierreTS = null;
         String Prioridad = "";
         boolean UsuarioCritico = false;
-        boolean SinNegocioInformado = false;
+        boolean sinNegocioInformado = false;
+        boolean reabierto = false;
         
         
     try (Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
@@ -174,15 +175,24 @@ public class CalculoINC_Cerradas {
                 
                 //Inicio Negocio Informado?
                 if (Negocio.equals("No Informado")){
-                    SinNegocioInformado = true;
+                    sinNegocioInformado = true;
                 }
                 
+                // Fin negocio informado
                 
+                //inicio Reabierto
+                
+                if (rs.getDouble("NumReaperturas") > 0) {
+                    reabierto = true;
+                  
+                }
+                
+                //TODO. PUESTO CLIENTE
                 
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
                         " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas + 
                         " Indisponibilidad: " + indisponibilidad + " Resuelto en: " + calculoResuelto + " Tipo Gravedad: " + Prioridad
-                        + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + SinNegocioInformado);
+                        + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + sinNegocioInformado + " Reabierto? :" + reabierto);
                 
 //               insertCalculo =  "INSERT INTO INC_Por_Fecha_Cierre_Result (TicketID,Negocio)"
 //                       + "VALUES(?,?)";
@@ -206,7 +216,8 @@ public class CalculoINC_Cerradas {
                 resuelto = 0;
                 calculoResuelto = 0;
                 UsuarioCritico = false;
-                SinNegocioInformado = false;
+                sinNegocioInformado = false;
+                reabierto = false;
                         
                 
             }
