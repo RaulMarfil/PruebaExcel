@@ -43,7 +43,7 @@ public class CalculoINC_Cerradas {
         Timestamp fechaCreacionTS = null;
         Timestamp fechaResolucionTS = null;
         Timestamp FechaCierreTS = null;
-        String Prioridad = "";
+        String Prioridad;
         boolean UsuarioCritico = false;
         boolean sinNegocioInformado = false;
         boolean reabierto = false;
@@ -167,8 +167,7 @@ public class CalculoINC_Cerradas {
                 //Inicio Afectación Cliente Crítico
                 
                 if (rs.getString("NombreCliente").equals("USUARIO CRITICO")){
-                    UsuarioCritico = true;
-                    
+                    UsuarioCritico = true;    
                 }
                 
                 //Fin afectación Cliente crítico
@@ -177,14 +176,11 @@ public class CalculoINC_Cerradas {
                 if (Negocio.equals("No Informado")){
                     sinNegocioInformado = true;
                 }
-                
                 // Fin negocio informado
                 
                 //inicio Reabierto
-                
                 if (rs.getDouble("NumReaperturas") > 0) {
                     reabierto = true;
-                  
                 }
                 
                 //TODO. PUESTO CLIENTE
