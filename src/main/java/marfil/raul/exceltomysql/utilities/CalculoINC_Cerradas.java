@@ -14,12 +14,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import marfil.raul.exceltomysql.utilities.*;
 
 
 
@@ -55,8 +53,10 @@ public class CalculoINC_Cerradas {
         boolean soporteFuncional = false;
         boolean soporteSistemas = false;
         boolean gestionUsuarios = false;
+        boolean nivelTres = false;
+        boolean nivelDos = false;
         
-        
+   
         
         
     try (Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
@@ -259,17 +259,35 @@ public class CalculoINC_Cerradas {
                 
                 //Inicio Nivel 3
                 
-                //TODO
+               for (Nivel_tres n : Nivel_tres.values()){
+            
+                    if (n.getNivel_tres().equals(rs.getString("Categ_Prod_3"))) {
+                        nivelTres = true;
+                    }
+            
+                }
                 //Fin Nivel 3
+               
+               
+                //Inicio Nivel 2
                 
+               for (Nivel_dos n : Nivel_dos.values()){
+            
+                    if (n.getNivel_dos().equals(rs.getString("Categ_Prod_2"))) {
+                        nivelDos = true;
+                    }
+            
+                }
+                //Fin Nivel 2
                 
+//                
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
                         " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas + 
                         " Indisponibilidad: " + indisponibilidad + " Resuelto en: " + calculoResuelto + " Tipo Gravedad: " + Prioridad
                         + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + sinNegocioInformado + " Reabierto? :" + reabierto +
                         " Puesto Cliente: " + puestoCliente + " Comunicaciones GNF: " + comunicacionesGNF + " BATCH Afectado?: " + batchAfectado +
                         " Backup Afectado?: " + backupAfectado + " Soporte Funcional: " + soporteFuncional + " Soporte Sistemas: " + soporteSistemas
-                        + " Gestion Usuarios: " + gestionUsuarios
+                        + " Gestion Usuarios: " + gestionUsuarios + " Nivel3: " + nivelTres + " Nivel2: " + nivelDos
                 
                 );
 //                
@@ -304,6 +322,8 @@ public class CalculoINC_Cerradas {
                 soporteFuncional = false;
                 soporteSistemas = false;
                 gestionUsuarios = false;
+                nivelTres = false;
+                nivelDos = false;
                         
                 
             }
