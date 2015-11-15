@@ -31,7 +31,7 @@ public class CalculoINC_Cerradas {
         
         String queryNegocio = "SELECT INC_Por_Fecha_Cierre.TicketID, INC_Por_Fecha_Cierre.Categ_Prod_2, SistemasNegocio.Negocio, AmbitoSS, Org_Soporte, FechaCierre \n" +
         ", NumReasing,IndisponibilidadServicio, FechaCreacion, Prioridad, NombreCliente, FechaResolucion, NumReaperturas,"
-                + "Categ_Prod_2 FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
+                + "Categ_Prod_2, Categ_Prod_3 FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
         String insertCalculo = "";
         String Negocio, fechaCierre,Org_Soporte,AmbitoSS,CategProd2,TicketID = "";
         int numEscalados = 0;
@@ -50,6 +50,13 @@ public class CalculoINC_Cerradas {
         boolean reabierto = false;
         boolean puestoCliente = false;
         boolean comunicacionesGNF = false;
+        boolean batchAfectado = false;
+        boolean backupAfectado = false;
+        boolean soporteFuncional = false;
+        boolean soporteSistemas = false;
+        boolean gestionUsuarios = false;
+        
+        
         
         
     try (Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
@@ -201,14 +208,63 @@ public class CalculoINC_Cerradas {
                 //fin comunicaciones GAS
                 
                 //Inicio BATCH
-                //TODO
+                
+                if (puestoCliente == false && comunicacionesGNF == false){
+                    if (rs.getString("Categ_Prod_3").equals("BATCH")) {
+                        batchAfectado = true;
+                    }
+                
+                }
                 //Fin BATCH
+                
+                
+                //Inicio BACKUP
+                
+                if (puestoCliente == false && comunicacionesGNF == false){
+                    if (rs.getString("Categ_Prod_3").equals("BACKUP")) {
+                        backupAfectado = true;
+                    }
+                }
+                //Fin BACKUP
+                
+                
+                //Inicio SOPORTE FUNCIONAL
+                
+                if (puestoCliente == false && comunicacionesGNF == false){
+                    if (rs.getString("Categ_Prod_3").equals("SOPORTE FUNCIONAL")) {
+                        soporteFuncional = true;
+                    }
+                }
+                //Fin SOPORTE FUNCIONAL
+                
+                
+                //Inicio SOPORTE SISTEMAS
+                
+                if (puestoCliente == false && comunicacionesGNF == false){
+                    if (rs.getString("Categ_Prod_3").equals("SOPORTE SISTEMAS")) {
+                        soporteSistemas = true;
+                    }
+                }
+                //Fin SOPORTE SISTEMAS
+                
+                
+                //Inicio GESTION USUARIOS Y CONTRASEÑAS
+                
+                if (puestoCliente == false && comunicacionesGNF == false){
+                    if (rs.getString("Categ_Prod_3").equals("GESTION DE USUARIOS Y CONTRASEÑAS")) {
+                        gestionUsuarios = true;
+                    }
+                }
+                //Fin GESTION USUARIOS Y CONTRASEÑAS
+                
                 
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
                         " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas + 
                         " Indisponibilidad: " + indisponibilidad + " Resuelto en: " + calculoResuelto + " Tipo Gravedad: " + Prioridad
                         + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + sinNegocioInformado + " Reabierto? :" + reabierto +
-                        " Puesto Cliente: " + puestoCliente + " Comunicaciones GNF: " + comunicacionesGNF
+                        " Puesto Cliente: " + puestoCliente + " Comunicaciones GNF: " + comunicacionesGNF + " BATCH Afectado?: " + batchAfectado +
+                        " Backup Afectado?: " + backupAfectado + " Soporte Funcional: " + soporteFuncional + " Soporte Sistemas: " + soporteSistemas
+                        + " Gestion Usuarios: " + gestionUsuarios
                 
                 );
 //                
@@ -238,6 +294,11 @@ public class CalculoINC_Cerradas {
                 reabierto = false;
                 puestoCliente = false;
                 comunicacionesGNF = false;
+                batchAfectado = false;
+                backupAfectado = false;
+                soporteFuncional = false;
+                soporteSistemas = false;
+                gestionUsuarios = false;
                         
                 
             }
