@@ -279,6 +279,12 @@ public class CalculoINC_Cerradas {
             
                 }
                 //Fin Nivel 2
+               
+               //inicio Nivel 3 + 2
+               //TODO
+               
+               
+               //fin inicio nivel 3 + 2
                 
 //                
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
