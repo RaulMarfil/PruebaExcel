@@ -30,7 +30,8 @@ public class CalculoINC_Cerradas {
         final long MILLSECS_PER_DAY = 24 * 60 * 60 * 1000;
         
         String queryNegocio = "SELECT INC_Por_Fecha_Cierre.TicketID, INC_Por_Fecha_Cierre.Categ_Prod_2, SistemasNegocio.Negocio, AmbitoSS, Org_Soporte, FechaCierre \n" +
-        ", NumReasing,IndisponibilidadServicio, FechaCreacion, Prioridad, NombreCliente, FechaResolucion, NumReaperturas FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
+        ", NumReasing,IndisponibilidadServicio, FechaCreacion, Prioridad, NombreCliente, FechaResolucion, NumReaperturas,"
+                + "Categ_Prod_2 FROM INC_Por_Fecha_Cierre LEFT JOIN SistemasNegocio ON INC_Por_Fecha_Cierre.Categ_Prod_2 = SistemasNegocio.AppGNF;";
         String insertCalculo = "";
         String Negocio, fechaCierre,Org_Soporte,AmbitoSS,CategProd2,TicketID = "";
         int numEscalados = 0;
@@ -47,6 +48,8 @@ public class CalculoINC_Cerradas {
         boolean UsuarioCritico = false;
         boolean sinNegocioInformado = false;
         boolean reabierto = false;
+        boolean puestoCliente = false;
+        boolean comunicacionesGNF = false;
         
         
     try (Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://172.16.224.137/prova?zeroDateTimeBehavior=convertToNull","root","vulcano1");
@@ -183,13 +186,32 @@ public class CalculoINC_Cerradas {
                     reabierto = true;
                 }
                 
-                //TODO. PUESTO CLIENTE
+                //inicio Puesto cliente
+                
+                if (rs.getString("Categ_Prod_2").equals("EQUIPO Y SOFTWARE")){
+                    puestoCliente = true;
+                }
+                
+                //fin puesto cliente
+                
+                //Inicio comunicaciones GAS
+                if (Org_Soporte.equals("TELECOMUNICACIONES - ESP") && AmbitoSS.equals("GasnaturalUF")) {
+                    comunicacionesGNF = true;
+                }
+                //fin comunicaciones GAS
+                
+                //Inicio BATCH
+                //TODO
+                //Fin BATCH
                 
                 System.out.println("Ticket:" + TicketID + " Negocio :" + Negocio + " FechaCierre: " + fechaCierre + 
                         " Escalados 0 - 2: " + escalados0a2 + " Escalados 3 - 5: " + escalados3a5 + " Escalados > 5: " +escalados5mas + 
                         " Indisponibilidad: " + indisponibilidad + " Resuelto en: " + calculoResuelto + " Tipo Gravedad: " + Prioridad
-                        + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + sinNegocioInformado + " Reabierto? :" + reabierto);
+                        + " Usuario Crítico: " + UsuarioCritico + " Negocio NO Informado: " + sinNegocioInformado + " Reabierto? :" + reabierto +
+                        " Puesto Cliente: " + puestoCliente + " Comunicaciones GNF: " + comunicacionesGNF
                 
+                );
+//                
 //               insertCalculo =  "INSERT INTO INC_Por_Fecha_Cierre_Result (TicketID,Negocio)"
 //                       + "VALUES(?,?)";
 //                
@@ -214,6 +236,8 @@ public class CalculoINC_Cerradas {
                 UsuarioCritico = false;
                 sinNegocioInformado = false;
                 reabierto = false;
+                puestoCliente = false;
+                comunicacionesGNF = false;
                         
                 
             }
